@@ -4,10 +4,12 @@ class csvWriter:
     import threading
     import time
     import random
+    import datetime
 
-    starttime=time.time() 
+    starttime=time.time()
+    x = datetime.datetime.now()
 
-    with open('mycsv.csv', 'w', newline='') as f:
+    with open('Weather Log %s.csv' % x, 'w', newline='') as f:
         fieldnames = ['Time', 'Temperature (F)', 'Humidity (%)', 'Pressure (hPa)']
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writeheader()
