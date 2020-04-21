@@ -8,7 +8,7 @@ import threading
 import datetime
 # import random
 
-
+    
 class sensorReader:
 
     # Initializers for the sensors.
@@ -35,7 +35,7 @@ class sensorReader:
 
         # Waits 60 seconds before repeating.
         time.sleep(60)
-
+        
 
 class csvWriter:
 
