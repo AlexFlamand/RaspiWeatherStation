@@ -20,10 +20,15 @@ class sensorReader:
 
         # Print the values to the console.
         try:
-            print("Pressure = %.2f hPa"%dps310.pressure)
-            global temperature_c = dhtDevice.temperature
-            global temperature_f = temperature_c * (9 / 5) + 32
-            global humidity = dhtDevice.humidity
+            global pres
+            pres = dps310.pressure
+            print("Pressure = %.2f hPa"%pres)
+            global temperature_c
+            temperature_c = dhtDevice.temperature
+            global temperature_f
+            temperature_f = temperature_c * (9 / 5) + 32
+            global humidity
+            humidity = dhtDevice.humidity
             print("Temp: {:.1f} F / {:.1f} C \nHumidity: {}% "
                 .format(temperature_f, temperature_c, humidity))
             print("")
@@ -34,7 +39,7 @@ class sensorReader:
             print("")
 
         # Waits 60 seconds before repeating.
-        time.sleep(60)
+        time.sleep(10)
 
 
 class csvWriter:
@@ -59,17 +64,21 @@ class csvWriter:
         # temp = random.randint(0,125)       
         # humi = random.randint(0,100)       
         # pres = random.randint(900,1000)    
-        
-        temp = global temperature_f
-        humi = global dhtDevice.humidity
-        pres = global dps310.pressure
-        
+             
         # Writes incoming data to the .csv file.
         with open('Weather Log %s.csv', 'a', newline='') as f: 
             fieldnames = ['TIME', 'TEMP', 'HUMI', 'PRES'] 
             thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-            thewriter.writerow({'TIME' : current_time, 'TEMP' : temp, 'HUMI' : humi, 'PRES' : pres})
+            thewriter.writerow({'TIME' : current_time, 'TEMP' : temperature_f, 'HUMI' : humidity, 'PRES' : pres})
     
         # Writes a message confirming the data's entry into the log, then sets a 60 second repeat cycle.
         print("New entry added.")
-        time.sleep(60.0 - ((time.time() - starttime) % 60.0)) # Repeat every ten seconds.
+        time.sleep(10.0 - ((time.time() - starttime) % 10.0)) # Repeat every ten seconds.
+
+r = sensorReader()
+t = threading.Thread(target = r, name = "Thread #1")
+t.start()
+t.join
+w = csvWriter()
+t = threading.Thread(target = w, name = "Thread #2")
+t.start()
