@@ -12,10 +12,6 @@ i2c = busio.I2C(board.SCL, board.SDA)
 dps310 = adafruit_dps310.DPS310(i2c)
 dhtDevice = adafruit_dht.DHT22(board.D4)
 
-temperature_c = dhtDevice.temperature
-temperature_f = temperature_c * (9 / 5) + 32
-humidity = dhtDevice.humidity
-
 def sensor_reader():
     
     while True:
@@ -23,6 +19,9 @@ def sensor_reader():
         # Print the values to the console.
         try:
             print("Pressure = %.2f hPa"%dps310.pressure)
+            temperature_c = dhtDevice.temperature
+            temperature_f = temperature_c * (9 / 5) + 32
+            humidity = dhtDevice.humidity
             print("Temp: {:.1f} F / {:.1f} C \nHumidity: {}% "
                 .format(temperature_f, temperature_c, humidity))
             print("")
@@ -58,15 +57,15 @@ while True:
     # humi = random.randint(0,100)       
     # pres = random.randint(900,1000)    
     
-    temp = temperature_f
-    humi = dhtDevice.humidity
-    pres = dps310.pressure
+    temperature_c_log = dhtDevice.temperature
+    temperature_f_log = temperature_c_log * (9 / 5) + 32
+    humidity_log = dhtDevice.humidity
     
     # Writes incoming data to the .csv file.
     with open('Weather Log %s.csv' % now, 'a', newline='') as f: 
         fieldnames = ['TIME', 'TEMP', 'HUMI', 'PRES'] 
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-        thewriter.writerow({'TIME' : current_time, 'TEMP' : temp, 'HUMI' : humi, 'PRES' : pres})
+        thewriter.writerow({'TIME' : current_time, 'TEMP' : temperature_f_log, 'HUMI' : humidity_log, 'PRES' : dps310.pressure})
 
     # Writes a message confirming the data's entry into the log, then sets a 60 second repeat cycle.
     print("New entry added.")

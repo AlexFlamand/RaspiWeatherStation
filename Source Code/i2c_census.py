@@ -30,4 +30,4 @@ class sensorReader:
             print("n/a")
             print("")
 
-        time.sleep(30)
+        time.sleep(60)
