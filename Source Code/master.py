@@ -37,6 +37,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 dps310 = adafruit_dps310.DPS310(i2c)
 dhtDevice = adafruit_dht.DHT22(board.D4)
 
+# Method reads data from the sensors.
 def sensor_reader():
     
     while True:
