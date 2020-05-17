@@ -30,9 +30,9 @@ import random
 from datetime import datetime
 
 # Initializers for the sensors.
-i2c = busio.I2C(board.SCL, board.SDA)
-dps310 = adafruit_dps310.DPS310(i2c)
-dhtDevice = adafruit_dht.DHT22(board.D4)
+# i2c = busio.I2C(board.SCL, board.SDA)
+# dps310 = adafruit_dps310.DPS310(i2c)
+# dhtDevice = adafruit_dht.DHT22(board.D4)
 
 def sensor_emulator():
     
@@ -40,12 +40,12 @@ def sensor_emulator():
 
         # Print the values to the console.
         try:
-            pressure = random.random(900.0, 1000.0)
+            pressure = random.randint(900, 1000)
             print("Pressure = %.2f hPa" %pressure)
             time.sleep(1)
-            temperature_c = random.random(25.0, 30.0)
+            temperature_c = random.randint(25, 30)
             temperature_f = temperature_c * (9 / 5) + 32
-            humidity = random.random(0.0, 99.9)
+            humidity = random.randint(0, 99)
             print("Temp: {:.1f} F / {:.1f} C \nHumidity: {}% "
                 .format(temperature_f, temperature_c, humidity))
             print("")
@@ -57,7 +57,7 @@ def sensor_emulator():
             print("")
 
         # Waits 60 seconds before repeating.
-        time.sleep(60)
+        time.sleep(3)
 
 # NOTE: Classes, which were present in the previous version, have been replaced with simpler functions due to problems with accessing the needed variables outside of their
 # local scope. These will be reintroduced during a future refactoring phase.
@@ -70,7 +70,7 @@ starttime=time.time()
 now = datetime.now()
 
 # Writes the header for the .csv file once.
-with open('Weather Log %s.csv' % now, 'w', newline='') as f:
+with open('D:\\Weather Log %s.csv', 'w', newline='') as f:
     fieldnames = ['Time', 'Temperature (C)', 'Humidity (%)', 'Pressure (hPa)']
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
@@ -78,14 +78,14 @@ with open('Weather Log %s.csv' % now, 'w', newline='') as f:
 # Fetches the date and time.
 while True:
     
-    temperature_c_log = random.random(25.0, 30.0)
+    temperature_c_log = random.randint(25, 30)
 #    To log the data in Fahrenheit units, uncomment the line below. Currently deactivated due to exceptions thrown during the conversion between data types.
     temperature_f_log = temperature_c_log * (9 / 5) + 32   
-    humidity_log = random.random(0.0, 99.9)
-    pressure_log = random.random(900.0, 1000.0)
+    humidity_log = random.randint(0, 99)
+    pressure_log = random.randint(900, 1000)
     
     # Writes incoming data to the .csv file.
-    with open('Weather Log %s.csv' % now, 'a', newline='') as f: 
+    with open('D:\\Weather Log %s.csv', 'a', newline='') as f: 
         fieldnames = ['TIME', 'TEMP', 'HUMI', 'PRES'] 
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow({'TIME' : now.strftime("%H:%M:%S"), 'TEMP' : temperature_c_log, 'HUMI' : humidity_log, 'PRES' : pressure_log})
