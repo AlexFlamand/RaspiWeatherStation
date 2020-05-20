@@ -3,7 +3,7 @@
 #       .~ .~~~..~.
 #      : .~.'~'.~. :
 #     ~ (   ) (   ) ~
-#    ( : '~'.~.'~' : )    WEATHER LOGGER V 1.0.1 - BETA
+#    ( : '~'.~.'~' : )    WEATHER LOGGER V 0.0.1 - ALPHA
 #     ~ .~ (   ) ~. ~
 #      (  : '~' :  ) 
 #       '~ .~~~. ~'
@@ -30,24 +30,27 @@ import adafruit_dps310
 import adafruit_dht
 import csv
 import threading
+import random
 from datetime import datetime
 
-# Initializers for the sensors.
+Initializers for the sensors.
 i2c = busio.I2C(board.SCL, board.SDA)
 dps310 = adafruit_dps310.DPS310(i2c)
 dhtDevice = adafruit_dht.DHT22(board.D4)
 
-def sensor_reader():
+def sensor_emulator():
     
     while True:
 
         # Print the values to the console.
         try:
-            print("Pressure = %.2f hPa"%dps310.pressure)
-            time.sleep(1)
-            temperature_c = dhtDevice.temperature
+            print("Weather conditions at start: ")
+            pressure = %dps310.pressure                     # %dps310.pressure         |   random.randint(900, 1000)
+            print("Pressure = %.2f hPa" %pressure)
+#            time.sleep(1)
+            temperature_c = dhtDevice.temperature                  # dhtDevice.temperature    |    random.randint(25, 30) 
             temperature_f = temperature_c * (9 / 5) + 32
-            humidity = dhtDevice.humidity
+            humidity = dhtDevice.humidity                    # dhtDevice.humidity       |   random.randint(0, 99)
             print("Temp: {:.1f} F / {:.1f} C \nHumidity: {}% "
                 .format(temperature_f, temperature_c, humidity))
             print("")
@@ -58,39 +61,41 @@ def sensor_reader():
             print("n/a")
             print("")
 
-        # Waits 60 seconds before repeating.
-        time.sleep(60)
+        # Waits 10 seconds before repeating.
+        time.sleep(10.0)
 
 # NOTE: Classes, which were present in the previous version, have been replaced with simpler functions due to problems with accessing the needed variables outside of their
 # local scope. These will be reintroduced during a future refactoring phase.
 
-#Initializes a background thread for logging activities.
-threading.Thread(target=sensor_reader, name="Thread #1", daemon=True).start()
+# FOR TESTING ONLY! Initializes a background thread for logging activities.
+threading.Thread(target=sensor_emulator, name="Thread #1", daemon=True).start()
 
 # Fetches the date and time for future file naming and data logging operations.
 starttime=time.time()
 now = datetime.now()
 
 # Writes the header for the .csv file once.
-with open('Weather Log %s.csv' % now, 'w', newline='') as f:
-    fieldnames = ['Time', 'Temperature (C)', 'Humidity (%)', 'Pressure (hPa)']
+with open('D:\\Weather Log.csv', 'w', newline='') as f:
+    fieldnames = ['Date', 'Time', 'Temperature (C)', 'Humidity (%)', 'Pressure (hPa)']
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 
 # Fetches the date and time.
 while True:
     
-    temperature_c_log = dhtDevice.temperature
-#    To log the data in Fahrenheit units, delete this line and uncomment the one below. Currently deactivated due to exceptions thrown during the conversion between data types.
-#    temperature_f_log = temperature_c_log * (9 / 5) + 32   
-    humidity_log = dhtDevice.humidity
+    now = datetime.now()
+
+    temperature_c_log = dhtDevice.temperature  # dhtDevice.temperature    |    random.randint(25, 30) 
+    temperature_f_log = temperature_c_log * (9 / 5) + 32   
+    humidity_log = dhtDevice.humidity        # dhtDevice.humidity       |   random.randint(0, 99)
+    pressure_log = %dps310.pressure       # %dps310.pressure         |   random.randint(900, 1000)
     
     # Writes incoming data to the .csv file.
-    with open('Weather Log %s.csv' % now, 'a', newline='') as f: 
-        fieldnames = ['TIME', 'TEMP', 'HUMI', 'PRES'] 
+    with open('D:\\Weather Log.csv', 'a', newline='') as f: 
+        fieldnames = ['DATE', 'TIME', 'TEMP', 'HUMI', 'PRES'] 
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-        thewriter.writerow({'TIME' : now.strftime("%H:%M:%S"), 'TEMP' : temperature_c_log, 'HUMI' : humidity_log, 'PRES' : dps310.pressure})
+        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : temperature_c_log, 'HUMI' : humidity_log, 'PRES' : pressure_log})
 
-    # Writes a message confirming the data's entry into the log, then sets a 60 second repeat cycle.
-    print("New entry added.")
-    time.sleep(60.0 - ((time.time() - starttime) % 60.0)) # Repeat every sixty seconds.
+    # Writes a message confirming the data's entry into the log, then sets a 10 second repeat cycle. For logging every half hour, change interval to 1800.
+    print("New entry added at " + now.strftime("%I:%M:%S %p") + ": "+ str(temperature_f_log) + " F | " + str(humidity_log) + "% | " + str(pressure_log) + " hPa")
+    time.sleep(10.0) # Repeat every ten seconds.
