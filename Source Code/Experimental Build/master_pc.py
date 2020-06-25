@@ -76,7 +76,7 @@ now = datetime.now()
 
 # Writes the header for the .csv file once.
 with open('D:\\Weather Log.csv', 'w', newline='') as f:
-    fieldnames = ['Date', 'Time', 'Temperature (C)', 'Humidity (%)', 'Pressure (hPa)']
+    fieldnames = ['Date', 'Time', 'Temperature (F)', 'Humidity (%)', 'Pressure (hPa)']
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 
@@ -94,7 +94,7 @@ while True:
     with open('D:\\Weather Log.csv', 'a', newline='') as f: 
         fieldnames = ['DATE', 'TIME', 'TEMP', 'HUMI', 'PRES'] 
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : temperature_c_log, 'HUMI' : humidity_log, 'PRES' : pressure_log})
+        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : temperature_f_log, 'HUMI' : humidity_log, 'PRES' : pressure_log})
 
     # Writes a message confirming the data's entry into the log, then sets a 10 second repeat cycle. For logging every half hour, change interval to 1800.
     print("New entry added at " + now.strftime("%I:%M:%S %p") + ": "+ str(temperature_f_log) + " F | " + str(humidity_log) + "% | " + str(pressure_log) + " hPa")
