@@ -3,9 +3,9 @@ from tkinter.ttk import Label
 
 window = Tk()   # Creates window
 window.title("Welcome to LikeGeeks app")    # Adds a title to the window
-window.geometry('350x200')  # Sets the window size
+window.geometry('480x360')  # Sets the window size
 
-lbl = Label(window, text = "Hello", font = ("Arial Bold", 50))  # Writes text to the window, with the message "Hello" with the font set to Arial Bold in 50 point size
+lbl = Label(window, text = "Hello", font = ("Arial Bold", 12))  # Writes text to the window, with the message "Hello" with the font set to Arial Bold in 12 point size
 lbl.grid(column = 0, row = 0)   # Aligns the text
 
 txt = Entry(window, width = 10) # Creates a text box in the window with a width of 10 characters

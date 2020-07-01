@@ -31,38 +31,47 @@ import adafruit_dht """
 import csv
 import threading
 import random
+import logging
+import math
 from datetime import datetime
+from logging.handlers import TimedRotatingFileHandler
+from math import gamma
 
 """ Initializers for the sensors.
 i2c = busio.I2C(board.SCL, board.SDA)
 dps310 = adafruit_dps310.DPS310(i2c)
 dhtDevice = adafruit_dht.DHT22(board.D4) """
 
+temperature_c_log = random.randint(25, 30)  # dhtDevice.temperature    |    random.randint(25, 30) 
+temperature_f_log = temperature_c_log * (9 / 5) + 32   
+humidity_log = random.randint(0, 99)        # dhtDevice.humidity       |   random.randint(0, 99)
+pressure_log = random.randint(900, 1000)    # %dps310.pressure         |   random.randint(900, 1000)
+altitude_log = 0
+dew_log = random.randint(40, 60)
+direction_log = 'SSE'
+speed_log = random.randint(3, 15)
+uv_log = random.randint(4, 6)
+
 def sensor_emulator():
     
     while True:
 
         # Print the values to the console.
-        try:
-            print("Weather conditions at start: ")
-            pressure = random.randint(900, 1000)                    # %dps310.pressure         |   random.randint(900, 1000)
-            print("Pressure = %.2f hPa" %pressure)
-#            time.sleep(1)
-            temperature_c = random.randint(25, 30)                  # dhtDevice.temperature    |    random.randint(25, 30) 
-            temperature_f = temperature_c * (9 / 5) + 32
-            humidity = random.randint(0, 99)                        # dhtDevice.humidity       |   random.randint(0, 99)
-            print("Temp: {:.1f} F / {:.1f} C \nHumidity: {}% "
-                .format(temperature_f, temperature_c, humidity))
-            print("")
-            return [float(temperature_c), float(temperature_f), float(humidity)]
-            
-        # Errors happen fairly often with DHT sensors, and will occasionally throw exceptions.
-        except RuntimeError as error:
-            print("n/a")
-            print("")
+        "int.gamma = (17.62 * temperature_c_log /(243.12 + temperature_c_log)) + math.log(humidity_log / 100.0)"
+        "int.dewpoint = (243.12 * gamma) / (17.62 - gamma)"
 
-        # Waits 10 seconds before repeating.
-        time.sleep(10.0)
+        print("Weather conditions at start: ")
+        print("\nTemperature: %0.1f C" % temperature_f_log)
+        print("Humidity: %0.1f %%" % humidity_log)
+        print("Pressure: %0.1f hPa" % pressure_log)
+        print("Altitude: %0.2f feet" % altitude_log)
+        print("Dew Point: %0.2f C" % dew_log)
+        print("Wind Heading: SSE")
+        print("Wind Speed: %0.2f mph" % speed_log)
+        print("UV Index: %0.2f" % uv_log)
+
+        # Waits a second(s) before repeating.
+        time.sleep(.1)
 
 # NOTE: Classes, which were present in the previous version, have been replaced with simpler functions due to problems with accessing the needed variables outside of their
 # local scope. These will be reintroduced during a future refactoring phase.
@@ -75,8 +84,8 @@ starttime=time.time()
 now = datetime.now()
 
 # Writes the header for the .csv file once.
-with open('D:\\Weather Log.csv', 'w', newline='') as f:
-    fieldnames = ['Date', 'Time', 'Temperature (F)', 'Humidity (%)', 'Pressure (hPa)']
+with open('D:\\Weather Log ' + now.strftime("%Y-%m-%d") + '.csv', 'w', newline='') as f: # DO NOT EDIT THIS! ALLOWS FOR DAY-TIME FILE CREATION!
+    fieldnames = ['Date', 'Time', 'Temperature (F)', 'Humidity (%)', 'Pressure (hPa)', 'Altitude (ft)', 'Dew Point (F)','Wind Heading', 'Wind Speed (mph)', 'UV Index']
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 
@@ -84,18 +93,13 @@ with open('D:\\Weather Log.csv', 'w', newline='') as f:
 while True:
     
     now = datetime.now()
-
-    temperature_c_log = random.randint(25, 30)  # dhtDevice.temperature    |    random.randint(25, 30) 
-    temperature_f_log = temperature_c_log * (9 / 5) + 32   
-    humidity_log = random.randint(0, 99)        # dhtDevice.humidity       |   random.randint(0, 99)
-    pressure_log = random.randint(900, 1000)    # %dps310.pressure         |   random.randint(900, 1000)
     
     # Writes incoming data to the .csv file.
-    with open('D:\\Weather Log.csv', 'a', newline='') as f: 
-        fieldnames = ['DATE', 'TIME', 'TEMP', 'HUMI', 'PRES'] 
+    with open('D:\\Weather Log ' + now.strftime("%Y-%m-%d") + '.csv', 'a', newline='') as f: # DO NOT EDIT THIS! ALLOWS FOR DAY-TIME FILE CREATION!
+        fieldnames = ['DATE', 'TIME', 'TEMP', 'HUMI', 'PRES', 'ALT', 'DEW', 'WIND', 'SPEED', 'UV'] 
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : temperature_f_log, 'HUMI' : humidity_log, 'PRES' : pressure_log})
+        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : temperature_f_log, 'HUMI' : humidity_log, 'PRES' : pressure_log, 'ALT' : altitude_log, 'DEW' : dew_log, 'WIND' : direction_log, 'SPEED' : speed_log, 'UV' : uv_log})
 
     # Writes a message confirming the data's entry into the log, then sets a 10 second repeat cycle. For logging every half hour, change interval to 1800.
-    print("New entry added at " + now.strftime("%I:%M:%S %p") + ": "+ str(temperature_f_log) + " F | " + str(humidity_log) + "% | " + str(pressure_log) + " hPa")
-    time.sleep(10.0) # Repeat every ten seconds.
+    print("New entry added at " + now.strftime("%I:%M:%S %p"))
+    time.sleep(.1) # Repeat every second(s).

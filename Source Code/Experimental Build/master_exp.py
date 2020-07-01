@@ -72,7 +72,7 @@ now = datetime.now()
 
 # Writes the header for the .csv file once.
 with open('D:\\Weather Log.csv', 'w', newline='') as f:
-    fieldnames = ['Date', 'Time', 'Temperature (C)', 'Humidity (%)', 'Pressure (hPa)', 'Dew Point (C)']
+    fieldnames = ['Date', 'Time', 'Temperature (F)', 'Humidity (%)', 'Pressure (hPa)', 'Altitude (ft)', 'Dew Point (F)','Wind Heading', 'Wind Speed (mph)', 'UV Index']
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 
@@ -88,13 +88,12 @@ while True:
     str.temperature_f_log = int.temperature_c_log * (9 / 5) + 32   
     int.gamma = (17.62 * bme280.temperature /(243.12 + bme280.temperature)) + math.log(bme280.humidity / 100.0)
     int.dewpoint = (243.12 * gamma) / (17.62 - gamma)
-    print(int.dewpoint)
         
     # Writes incoming data to the .csv file.
-    with open('D:\\Weather Log.csv', 'a', newline='') as f: 
-        fieldnames = ['DATE', 'TIME', 'TEMP', 'HUMI', 'PRES', 'DEW'] 
+    with open('Weather Log ' + now.strftime("%Y-%m-%d") + '.csv', 'a', newline='') as f: 
+        fieldnames = ['DATE', 'TIME', 'TEMP', 'HUMI', 'PRES', 'ALT', 'DEW', 'WIND', 'SPEED', 'UV'] 
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : int.temperature_c_log, 'HUMI' : int.humidity_log, 'PRES' : int.pressure_log, 'DEW' : int.dewpoint})
+        thewriter.writerow({'DATE' : now.strftime("%Y/%m/%d"),'TIME' : now.strftime("%I:%M:%S %p"), 'TEMP' : int.temperature_f_log, 'HUMI' : int.humidity_log, 'PRES' : int.pressure_log, 'ALT' : int.altitude_log, 'DEW' : int.dew_log, 'WIND' : int.direction_log, 'SPEED' : int.speed_log, 'UV' : int.uv_log})
 
     # Writes a message confirming the data's entry into the log, then sets a 10 second repeat cycle. For logging every half hour, change interval to 1800.
     print("New entry added at " + now.strftime("%I:%M:%S %p"))
